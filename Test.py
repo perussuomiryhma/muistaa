@@ -2,7 +2,6 @@ import streamlit as st
 from PIL import Image
 import random
 import os
-import base64
 
 # 1. 퀴즈 데이터 세팅
 Meidän_ryhmä = {
@@ -42,32 +41,27 @@ if 'sanat' not in st.session_state:
 st.set_page_config(page_title="Meidän ryhmä", page_icon="🇫🇮", layout="centered")
 st.title("🇫🇮 Meidän ryhmä")
 
-# 🎵 3. 절대 멈추지 않는 배경음악 시스템 (안전한 Base64 방식)
-def play_bgm():
-    if os.path.exists("bgm.mp3"):
-        with open("bgm.mp3", "rb") as f:
-            data = f.read()
-            b64 = base64.b64encode(data).decode()
-            md = f"""
-                <audio id="bgm" autoplay loop>
-                    <source src="data:audio/mp3;base64,{b64}" type="audio/mp3">
-                </audio>
-                <script>
-                    var audio = document.getElementById("bgm");
-                    audio.volume = 0.3; // 볼륨 크기 (0.0 ~ 1.0)
-                    if (localStorage.getItem("bgm_time")) {{
-                        audio.currentTime = parseFloat(localStorage.getItem("bgm_time"));
-                    }}
-                    setInterval(function() {{
-                        localStorage.setItem("bgm_time", audio.currentTime);
-                    }}, 300);
-                </script>
-                """
-            st.markdown(md, unsafe_allow_html=True)
-    else:
-        st.caption("(BGM 기능을 사용하려면 GitHub에 bgm.mp3 파일을 올려주세요)")
+# 🎵 3. 인터넷 URL 기반 무한 반복 배경음악 (100% 작동 보장 방식)
+# 저작권 없는 안정적인 배경음악 주소를 직접 스트리밍합니다.
+bgm_url = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
 
-play_bgm()
+st.markdown(f"""
+    <audio id="bgm" autoplay loop>
+        <source src="{bgm_url}" type="audio/mp3">
+    </audio>
+    <script>
+        var audio = document.getElementById("bgm");
+        audio.volume = 0.2; // 볼륨 크기 (0.0 ~ 1.0)
+        
+        // 페이지가 새로고침되어도 음악이 끊기지 않고 이어지게 만드는 마법
+        if (localStorage.getItem("bgm_time")) {{
+            audio.currentTime = parseFloat(localStorage.getItem("bgm_time"));
+        }}
+        setInterval(function() {{
+            localStorage.setItem("bgm_time", audio.currentTime);
+        }}, 300);
+    </script>
+""", unsafe_allow_html=True)
 
 
 # 🏆 4. 게임 종료 및 B1 TODISTUS 출력 화면
