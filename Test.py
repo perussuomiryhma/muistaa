@@ -42,19 +42,14 @@ if 'sanat' not in st.session_state:
 st.set_page_config(page_title="Meidän ryhmä", page_icon="🇫🇮", layout="centered")
 st.title("🇫🇮 Meidän ryhmä")
 
-# 🎵 3. 무한 반복 배경음악 플레이어 (새로고침되어도 유지되는 비밀 코드)
-# 크롬 브라우저 정책상 사용자가 웹사이트 아무 곳이나 한 번 클릭해야 소리가 나기 시작합니다!
+# 🎵 3. 무한 반복 배경음악 플레이어
 st.markdown("""
-    <iframe src="https://colab.research.google.com/" style="display:none;" id="dummy"></iframe>
     <audio id="bgm" autoplay loop>
         <source src="app/static/bgm.mp3" type="audio/mp3">
     </audio>
     <script>
-        // 무한 반복 및 페이지 이동 시 기억 장치 작동
         var audio = document.getElementById("bgm");
-        audio.volume = 0.4; // 볼륨 조절 (0.0 ~ 1.0)
-        
-        // 페이지 새로고침 시 음악이 끊기지 않은 것처럼 이어 붙이는 마법
+        audio.volume = 0.4;
         if (localStorage.getItem("bgm_time")) {
             audio.currentTime = parseFloat(localStorage.getItem("bgm_time"));
         }
@@ -65,21 +60,55 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
+# 🏆 4. 게임 종료 및 B1 TODISTUS 출력 화면
 if st.session_state.game_over:
     st.balloons()
-    st.success(f"🎉 Peli on päättynyt! Tuloksesi: {st.session_state.pisteet}/{len(Meidän_ryhmä)}")
-    st.info("Heidi opettaja, sinä olet B1, tämä on B1 todistus! 📜")
-    if st.button("Aloita alusta (Pelaa uudelleen)"):
+    
+    # 점수 계산
+    max_pisteet = len(Meidän_ryhmä)
+    saadut_pisteet = st.session_state.pisteet
+    
+    st.success(f"🎉 Peli on päättynyt! Tuloksesi: {saadut_pisteet}/{max_pisteet}")
+    
+    # 만점(모든 문제를 다 맞힘)인 경우에만 완벽한 B1 증서 출력!
+    if saadut_pisteet == max_pisteet:
+        st.markdown("""
+        <div style="border: 8px double #D4AF37; padding: 30px; text-align: center; background-color: #FDFBF7; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-top: 20px;">
+            <span style="font-size: 50px;">🏅</span>
+            <h1 style="color: #1A365D; font-family: 'Georgia', serif; font-size: 36px; margin-bottom: 5px;">VIRALLINEN TODISTUS</h1>
+            <p style="color: #666; font-size: 14px; letter-spacing: 2px; margin-top: 0;">SUOMEN KIELEN OSAAMINEN</p>
+            <hr style="border: 0; height: 1px; background-image: linear-gradient(to right, rgba(0,0,0,0), rgba(212,175,55,0.75), rgba(0,0,0,0)); margin: 20px 0;">
+            <p style="font-size: 18px; color: #333; font-style: italic;">Täten todistetaan, että</p>
+            <h2 style="color: #D4AF37; font-family: 'Arial', sans-serif; font-size: 32px; margin: 15px 0;">Heidi Opettaja</h2>
+            <p style="font-size: 18px; color: #333; line-height: 1.6;">
+                on läpäissyt "Meidän ryhmä" -tietokilpailun <br>
+                <b>täydellisillä pisteillä ({saadut_pisteet}/{max_pisteet})</b> <br>
+                ja saavuttanut virallisesti tason:
+            </p>
+            <div style="background-color: #1A365D; color: white; display: inline-block; padding: 10px 40px; font-size: 30px; font-weight: bold; border-radius: 8px; margin: 20px 0; letter-spacing: 3px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
+                TASO: B1
+            </div>
+            <p style="font-size: 16px; color: #555; margin-top: 15px;">
+                <i>"Onnea! Sinä olet todellinen B1-tason mestari!"</i>
+            </p>
+            <hr style="border: 0; height: 1px; background-image: linear-gradient(to right, rgba(0,0,0,0), rgba(212,175,55,0.75), rgba(0,0,0,0)); margin: 20px 0;">
+            <p style="font-size: 12px; color: #999;">Myönnetty kunnianosoituksena luokan opiskelijoilta</p>
+        </div>
+        """, unsafe_allow_html=True)
+    else:
+        # 하나라도 틀렸을 때 나오는 일반 종료 안내
+        st.warning("Heidi opettaja! Sinä olet A2.2. Yritä uudelleen saadaksesi B1-todistuksen! 💪")
+
+    if st.button("Aloita alusta (Pelaa uudelleen) 🔄"):
         for key in list(st.session_state.keys()):
             del st.session_state[key]
-        st.erase()
         st.rerun()
 
 else:
     current_q = st.session_state.sanat[st.session_state.idx]
     oikea_vastaus = Meidän_ryhmä[current_q]
     
-    # 4. 이미지 출력 로직
+    # 5. 이미지 출력 로직
     img_path = None
     target_folder = "image"
     
@@ -106,7 +135,7 @@ else:
     else:
         st.error(f"❌ Kuvaa ei löytynyt: image/{oikea_vastaus.lower()}")
 
-    # 5. UI 및 입력창
+    # 6. UI 및 입력창
     st.write(f"**Kysymys {st.session_state.idx + 1} / {len(Meidän_ryhmä)}**")
     st.info(current_q)
 
