@@ -35,22 +35,19 @@ if 'sanat' not in st.session_state:
     st.session_state.pisteet = 0
     st.session_state.game_over = False
     st.session_state.show_correct_image = False
-    st.session_state.game_started = False  
 
 st.set_page_config(page_title="Meidän ryhmä", layout="centered")
 
-# 배경음악 주소 설정 (인터넷에서 스트리밍되는 안전한 프리 MP3)
-bgm_url = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
+classic_bgm = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"
 
-# 게임이 시작되면 화면 상단에 눈에 안 띄게 고정되는 플레이어 (새로고침 우회 포함)
-if st.session_state.game_started and not st.session_state.game_over:
+if not st.session_state.game_over:
     st.markdown(f"""
         <audio id="bgm" autoplay loop>
-            <source src="{bgm_url}" type="audio/mp3">
+            <source src="{classic_bgm}" type="audio/mp3">
         </audio>
         <script>
             var audio = document.getElementById("bgm");
-            audio.volume = 0.2;
+            audio.volume = 0.15;
             if (localStorage.getItem("bgm_time")) {{
                 audio.currentTime = parseFloat(localStorage.getItem("bgm_time"));
             }}
@@ -62,42 +59,7 @@ if st.session_state.game_started and not st.session_state.game_over:
 
 st.title("Meidän ryhmä")
 
-# 🎮 1. 첫 대기 화면 (여기서 음악을 틀고 시작하게 유도!)
-if not st.session_state.game_started:
-    st.write("### Tervetuloa peliin!")
-    
-    # 🎵 여기에 100% 소리가 재생되는 플레이어 박스 배치!
-    st.markdown(f"""
-        <div style="background-color: #f0f2f6; padding: 15px; border-radius: 10px; text-align: center; margin-bottom: 20px;">
-            <p style="margin: 0 0 10px 0; font-size: 15px; font-weight: bold; color: #333;">🎵 Käynnistä taustamusiikki tästä (재생 버튼을 먼저 누르세요!)</p>
-            <audio id="start_bgm" controls loop style="width: 100%; max-width: 400px;">
-                <source src="{bgm_url}" type="audio/mp3">
-            </audio>
-        </div>
-        <script>
-            var startAudio = document.getElementById("start_bgm");
-            startAudio.volume = 0.2;
-            // 여기서 플레이어가 재생되면 시간을 기억함
-            setInterval(function() {{
-                if (!startAudio.paused) {{
-                    localStorage.setItem("bgm_time", startAudio.currentTime);
-                }}
-            }}, 300);
-        </script>
-    """, unsafe_allow_html=True)
-    
-    target_folder = "image"
-    if os.path.exists(target_folder):
-        for f in os.listdir(target_folder):
-            if "main" in f.lower():
-                st.image(Image.open(os.path.join(target_folder, f)), width=350)
-                break
-                
-    if st.button("▶️ Aloita peli", type="primary", use_container_width=True):
-        st.session_state.game_started = True
-        st.rerun()
-
-elif st.session_state.game_over:
+if st.session_state.game_over:
     st.balloons()
     max_pisteet = len(Meidän_ryhmä)
     saadut_pisteet = st.session_state.pisteet
@@ -131,7 +93,7 @@ elif st.session_state.game_over:
     else:
         st.warning("Heidi opettaja! Sinä olet A2.2. Yritä uudelleen saadaksesi B1-todistuksen! 💪")
 
-    if st.button("Aloita alusta (Pelaa uudelleen) 🔄"):
+    if st.button("Aloita alusta 🔄"):
         for key in list(st.session_state.keys()):
             del st.session_state[key]
         st.rerun()
