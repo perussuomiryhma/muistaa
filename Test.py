@@ -1,8 +1,8 @@
 import streamlit as st
-import streamlit.components.v1 as components
 from PIL import Image
 import random
 import os
+import base64
 
 # 1. 퀴즈 데이터 세팅
 Meidän_ryhmä = {
@@ -42,35 +42,41 @@ if 'sanat' not in st.session_state:
 st.set_page_config(page_title="Meidän ryhmä", page_icon="🇫🇮", layout="centered")
 st.title("🇫🇮 Meidän ryhmä")
 
-# 🎵 3. 무한 반복 배경음악 플레이어
-st.markdown("""
-    <audio id="bgm" autoplay loop>
-        <source src="app/static/bgm.mp3" type="audio/mp3">
-    </audio>
-    <script>
-        var audio = document.getElementById("bgm");
-        audio.volume = 0.4;
-        if (localStorage.getItem("bgm_time")) {
-            audio.currentTime = parseFloat(localStorage.getItem("bgm_time"));
-        }
-        setInterval(function() {
-            localStorage.setItem("bgm_time", audio.currentTime);
-        }, 300);
-    </script>
-""", unsafe_allow_html=True)
+# 🎵 3. 절대 멈추지 않는 배경음악 시스템 (안전한 Base64 방식)
+def play_bgm():
+    if os.path.exists("bgm.mp3"):
+        with open("bgm.mp3", "rb") as f:
+            data = f.read()
+            b64 = base64.b64encode(data).decode()
+            md = f"""
+                <audio id="bgm" autoplay loop>
+                    <source src="data:audio/mp3;base64,{b64}" type="audio/mp3">
+                </audio>
+                <script>
+                    var audio = document.getElementById("bgm");
+                    audio.volume = 0.3; // 볼륨 크기 (0.0 ~ 1.0)
+                    if (localStorage.getItem("bgm_time")) {{
+                        audio.currentTime = parseFloat(localStorage.getItem("bgm_time"));
+                    }}
+                    setInterval(function() {{
+                        localStorage.setItem("bgm_time", audio.currentTime);
+                    }}, 300);
+                </script>
+                """
+            st.markdown(md, unsafe_allow_html=True)
+    else:
+        st.caption("(BGM 기능을 사용하려면 GitHub에 bgm.mp3 파일을 올려주세요)")
+
+play_bgm()
 
 
 # 🏆 4. 게임 종료 및 B1 TODISTUS 출력 화면
 if st.session_state.game_over:
     st.balloons()
-    
-    # 점수 계산
     max_pisteet = len(Meidän_ryhmä)
     saadut_pisteet = st.session_state.pisteet
-    
     st.success(f"🎉 Peli on päättynyt! Tuloksesi: {saadut_pisteet}/{max_pisteet}")
     
-    # 만점(모든 문제를 다 맞힘)인 경우에만 완벽한 B1 증서 출력!
     if saadut_pisteet == max_pisteet:
         st.markdown("""
         <div style="border: 8px double #D4AF37; padding: 30px; text-align: center; background-color: #FDFBF7; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-top: 20px;">
@@ -96,7 +102,6 @@ if st.session_state.game_over:
         </div>
         """, unsafe_allow_html=True)
     else:
-        # 하나라도 틀렸을 때 나오는 일반 종료 안내
         st.warning("Heidi opettaja! Sinä olet A2.2. Yritä uudelleen saadaksesi B1-todistuksen! 💪")
 
     if st.button("Aloita alusta (Pelaa uudelleen) 🔄"):
