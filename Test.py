@@ -13,7 +13,7 @@ Meidän_ryhmä = {
     "Hän tuli luokallemme kesken kurssin, kun se oli jo alkanut.": "Mbuyi",
     "Hän vastaa aina erittäin aktiivisesti tunneilla.": "Hamza",
     "Hän osasi jo ensimmäisellä tunnilla paljon sanoja ja puhui hyvää suomea.": "Sunita",
-    "Hän ymmärsi opettajaa ja vastasi hienosti heti ensimmäisestä tunnista lähtien.": "Antoni",
+    "Hän ymmärsi opettajaa ja vastasi hienosti heti ensimmäisestä tunnista lähtien.": "Antony",
     "Hän tuli luokallemme noin elokuussa. Puhuu hyvää suomea ja haaveilee vaatesuunnittelijan urasta.": "Khali",
     "Hän on pieni mutta vahva. Hän on aina erittäin ystävällinen.": "Sakineh",
     "Hänestä oli heti alusta asti paljon huhuja, että hän puhuu erittäin hyvää suomea.": "Oksana",
