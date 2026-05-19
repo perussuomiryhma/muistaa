@@ -1,24 +1,9 @@
-import sys
-import os
-import subprocess
-import tkinter as tk
-from tkinter import messagebox
+import streamlit as st
+from PIL import Image
 import random
-import winsound
+import os
 
-# 1. 인코딩 및 환경 설정
-os.environ["PYTHONIOENCODING"] = "utf-8"
-
-# 2. 필수 라이브러리 설치
-try:
-    from PIL import Image, ImageTk
-except ModuleNotFoundError:
-    subprocess.check_call([sys.executable, "-m", "pip", "install", "pillow"])
-    from PIL import Image, ImageTk
-
-# 3. 설정
-IMAGE_FOLDER_PATH = r"C:\Users\Work-1\Desktop\image"
-
+# 1. 퀴즈 데이터 세팅
 Meidän_ryhmä = {
     "Kuka on luokkamme opettaja?": "Heidi", 
     "Kuka on luokkamme insinööri?": "Migara",
@@ -40,97 +25,95 @@ Meidän_ryhmä = {
     "Hänellä on aina paras ystävä vierellään. Molemmat heistä puhuvat erittäin hyvää suomea.": "Soosan"
 }
 
-kaikki_sanat = list(Meidän_ryhmä.keys())
-eka_kysymys = kaikki_sanat[0]
-muut_kysymykset = kaikki_sanat[1:]    
-random.shuffle(muut_kysymykset)        
-sanat = [eka_kysymys] + muut_kysymykset 
+# 2. 웹 브라우저용 세션 상태 초기화
+if 'sanat' not in st.session_state:
+    kaikki_sanat = list(Meidän_ryhmä.keys())
+    eka_kysymys = kaikki_sanat[0]
+    muut_kysymykset = kaikki_sanat[1:]    
+    random.shuffle(muut_kysymykset)        
+    st.session_state.sanat = [eka_kysymys] + muut_kysymykset 
+    
+    st.session_state.idx = 0
+    st.session_state.pisteet = 0
+    st.session_state.game_over = False
+    st.session_state.show_correct_image = False
 
-nykyinen_numero = 0
-pisteet = 0
-g_keep_image = None 
+st.set_page_config(page_title="Meidän ryhmä", page_icon="🇫🇮", layout="centered")
+st.title("🇫🇮 Meidän ryhmä")
 
-# 4. 함수 정의
-def find_any_matching_image(filename_without_ext, is_main=False):
-    if not os.path.exists(IMAGE_FOLDER_PATH): return None
-    valid_extensions = (".jpg", ".jpeg", ".png", ".bmp", ".gif")
-    files = os.listdir(IMAGE_FOLDER_PATH)
-    if is_main:
-        for f in files:
-            if ("quiz_main" in f.lower() or "main" in f.lower()) and f.lower().endswith(valid_extensions):
-                return os.path.join(IMAGE_FOLDER_PATH, f)
-    else:
-        for f in files:
-            name_part, ext_part = os.path.splitext(f)
-            if name_part.lower() == filename_without_ext.lower() and ext_part.lower() in valid_extensions:
-                return os.path.join(IMAGE_FOLDER_PATH, f)
-    return None
+if st.session_state.game_over:
+    st.balloons()
+    st.success(f"🎉 Peli on päättynyt! Tuloksesi: {st.session_state.pisteet}/{len(Meidän_ryhmä)}")
+    st.info("Heidi opettaja, sinä olet B1, tämä on B1 todistus! 📜")
+    if st.button("Aloita alusta (Pelaa uudelleen)"):
+        for key in list(st.session_state.keys()):
+            del st.session_state[key]
+        st.rerun()
 
-def set_label_image_by_logic(name_without_ext, is_main=False):
-    global g_keep_image
-    final_path = find_any_matching_image(name_without_ext, is_main)
-    try:
-        if final_path:
-            img = Image.open(final_path)
-            img.thumbnail((260, 260))  
-            g_keep_image = ImageTk.PhotoImage(img)
-            kuva_label.config(image=g_keep_image, text="")
+else:
+    current_q = st.session_state.sanat[st.session_state.idx]
+    oikea_vastaus = Meidän_ryhmä[current_q]
+    
+    # 3. 이미지 출력 로직
+    img_path = None
+    target_folder = "image"
+    
+    if os.path.exists(target_folder):
+        files = os.listdir(target_folder)
+        if st.session_state.show_correct_image:
+            for f in files:
+                name_part, _ = os.path.splitext(f)
+                if name_part.lower() == oikea_vastaus.lower():
+                    img_path = os.path.join(target_folder, f)
+                    break
         else:
-            kuva_label.config(image="", text="Kuvaa ei löytynyt")
-    except Exception:
-        kuva_label.config(image="", text="Virhe kuvan lataamisessa")
+            for f in files:
+                if "main" in f.lower():
+                    img_path = os.path.join(target_folder, f)
+                    break
 
-def tarkista_vastaus():
-    global nykyinen_numero, pisteet
-    user_input = syotto.get().strip()
-    if not user_input: return
-    kayttajan_vastaus = user_input.title()
-    nykyinen_sana = sanat[nykyinen_numero]
-    oikea_vastaus = Meidän_ryhmä[nykyinen_sana]
-    
-    set_label_image_by_logic(oikea_vastaus.lower(), is_main=False)
-    ikkuna.update() 
-    
-    if kayttajan_vastaus == oikea_vastaus:
-        winsound.Beep(523, 150)
-        messagebox.showinfo("Oikein!", "Heidi opettaja! Sinä olet B1 🎉")
-        pisteet += 1
-        set_label_image_by_logic("quiz_main", is_main=True)
-        ikkuna.update()
-        nykyinen_numero += 1
-        syotto.delete(0, tk.END)
-        seuraava_kysymys()
+    if img_path and os.path.exists(img_path):
+        try:
+            image = Image.open(img_path)
+            st.image(image, width=300)
+        except Exception:
+            st.warning("⚠️ Kuvan avaamisessa on ongelma.")
     else:
-        winsound.Beep(220, 500)
-        hint = oikea_vastaus[0]
-        messagebox.showerror("Väärin", f"Heidi opettaja! Sinä olet A2.2\nVinkki: {hint}")
-        set_label_image_by_logic("quiz_main", is_main=True)
-        ikkuna.update()
-        syotto.delete(0, tk.END)
-        syotto.focus()
+        st.error(f"❌ Kuvaa ei löytynyt: image/{oikea_vastaus.lower()}")
 
-def seuraava_kysymys():
-    if nykyinen_numero < len(sanat):
-        teksti_kysymys.config(text=sanat[nykyinen_numero])
-        if nykyinen_numero == 0: set_label_image_by_logic("quiz_main", is_main=True)
+    # 4. UI 및 입력창
+    st.write(f"**Kysymys {st.session_state.idx + 1} / {len(Meidän_ryhmä)}**")
+    st.info(current_q)
+
+    if 'feedback' in st.session_state:
+        if st.session_state.feedback_type == "success":
+            st.success(st.session_state.feedback)
+        else:
+            st.error(st.session_state.feedback)
+
+    if st.session_state.show_correct_image:
+        if st.button("Seuraava kysymys ➡️"):
+            st.session_state.show_correct_image = False
+            st.session_state.idx += 1
+            if 'feedback' in st.session_state:
+                del st.session_state.feedback
+            
+            if st.session_state.idx >= len(st.session_state.sanat):
+                st.session_state.game_over = True
+            st.rerun()
     else:
-        # [마지막 문구 적용]
-        messagebox.showinfo("Peli ohi", f"Heidi opettaja, sinä olet B1, tämä on B1 todistus! 🎉\nTuloksesi: {pisteet}/{len(Meidän_ryhmä)}")
-        ikkuna.destroy()
-
-# 5. UI 디자인
-ikkuna = tk.Tk()
-ikkuna.title("Meidän ryhmä")
-ikkuna.geometry("550x550")
-ikkuna.config(bg="#f4f7f6")
-kuva_label = tk.Label(ikkuna, bg="#f4f7f6", fg="red", justify="center", font=("Helvetica", 10, "bold"), wraplength=500)
-kuva_label.pack(pady=20)
-teksti_kysymys = tk.Label(ikkuna, text="", font=("Helvetica", 14, "bold"), bg="#f4f7f6", fg="#003580", wraplength=500, justify="center")
-teksti_kysymys.pack(pady=15)
-syotto = tk.Entry(ikkuna, font=("Helvetica", 13), width=20, justify="center", bd=2, relief="groove")
-syotto.pack(pady=5)
-syotto.focus()
-painike_tarkista = tk.Button(ikkuna, text="Tarkista", font=("Helvetica", 11, "bold"), bg="#003580", fg="white", width=15, height=1, relief="flat", command=tarkista_vastaus)
-painike_tarkista.pack(pady=15)
-ikkuna.after(10, seuraava_kysymys)
-ikkuna.mainloop()
+        with st.form(key=f"quiz_form_{st.session_state.idx}", clear_on_submit=True):
+            user_input = st.text_input("Kirjoita nimi tähän:").strip()
+            submit_button = st.form_submit_button(label="Tarkista")
+            
+            if submit_button and user_input:
+                if user_input.title() == oikea_vastaus:
+                    st.session_state.feedback = "Heidi opettaja! Sinä olet B1 🎉"
+                    st.session_state.feedback_type = "success"
+                    st.session_state.pisteet += 1
+                    st.session_state.show_correct_image = True
+                    st.rerun()
+                else:
+                    st.session_state.feedback = f"Heidi opettaja! Sinä olet A2.2\nVinkki: {oikea_vastaus[0]}"
+                    st.session_state.feedback_type = "error"
+                    st.rerun()
