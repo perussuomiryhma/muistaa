@@ -1,4 +1,5 @@
 import streamlit as st
+import streamlit.components.v1 as components
 from PIL import Image
 import random
 import os
@@ -41,6 +42,29 @@ if 'sanat' not in st.session_state:
 st.set_page_config(page_title="Meidän ryhmä", page_icon="🇫🇮", layout="centered")
 st.title("🇫🇮 Meidän ryhmä")
 
+# 🎵 3. 무한 반복 배경음악 플레이어 (새로고침되어도 유지되는 비밀 코드)
+# 크롬 브라우저 정책상 사용자가 웹사이트 아무 곳이나 한 번 클릭해야 소리가 나기 시작합니다!
+st.markdown("""
+    <iframe src="https://colab.research.google.com/" style="display:none;" id="dummy"></iframe>
+    <audio id="bgm" autoplay loop>
+        <source src="app/static/bgm.mp3" type="audio/mp3">
+    </audio>
+    <script>
+        // 무한 반복 및 페이지 이동 시 기억 장치 작동
+        var audio = document.getElementById("bgm");
+        audio.volume = 0.4; // 볼륨 조절 (0.0 ~ 1.0)
+        
+        // 페이지 새로고침 시 음악이 끊기지 않은 것처럼 이어 붙이는 마법
+        if (localStorage.getItem("bgm_time")) {
+            audio.currentTime = parseFloat(localStorage.getItem("bgm_time"));
+        }
+        setInterval(function() {
+            localStorage.setItem("bgm_time", audio.currentTime);
+        }, 300);
+    </script>
+""", unsafe_allow_html=True)
+
+
 if st.session_state.game_over:
     st.balloons()
     st.success(f"🎉 Peli on päättynyt! Tuloksesi: {st.session_state.pisteet}/{len(Meidän_ryhmä)}")
@@ -48,13 +72,14 @@ if st.session_state.game_over:
     if st.button("Aloita alusta (Pelaa uudelleen)"):
         for key in list(st.session_state.keys()):
             del st.session_state[key]
+        st.erase()
         st.rerun()
 
 else:
     current_q = st.session_state.sanat[st.session_state.idx]
     oikea_vastaus = Meidän_ryhmä[current_q]
     
-    # 3. 이미지 출력 로직
+    # 4. 이미지 출력 로직
     img_path = None
     target_folder = "image"
     
@@ -81,7 +106,7 @@ else:
     else:
         st.error(f"❌ Kuvaa ei löytynyt: image/{oikea_vastaus.lower()}")
 
-    # 4. UI 및 입력창
+    # 5. UI 및 입력창
     st.write(f"**Kysymys {st.session_state.idx + 1} / {len(Meidän_ryhmä)}**")
     st.info(current_q)
 
