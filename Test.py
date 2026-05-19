@@ -18,7 +18,7 @@ Meidän_ryhmä = {
     "Hän on pieni mutta vahva. Hän on aina erittäin ystävällinen.": "Sakineh",
     "Hänestä oli heti alusta asti paljon huhuja, että hän puhuu erittäin hyvää suomea.": "Oksana",
     "Hän oli erittäin aktiivinen ensiapuohjelmassa.": "Andri",
-    "Hän istuu aina takarivissä, mutta suhtautuu suomen kielen opiskeluun suurella sydämellä.": "Sergi",
+    "Hän istuu aina takarivissä, mutta suhtautuu suomen kielen opiskeluun suurella sydämellä.": "Serhii",
     "Hän on aina Oksanan parina luokassa.": "Elena",
     "Kuka istuu Tanjan lähellä?": "Anna",
     "Hän on erittäin kiinnostunut suomen kielestä ja on aina ystävällinen.": "Elius",
