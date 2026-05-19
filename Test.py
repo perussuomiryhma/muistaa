@@ -2,9 +2,8 @@ import streamlit as st
 from PIL import Image
 import random
 import os
-import base64
 
-# 1. 퀴즈 데이터 세팅
+# 1. 퀴즈 데이터 세팅 (요청하신 이름 철자 완벽 반영)
 Meidän_ryhmä = {
     "Kuka on luokkamme opettaja?": "Heidi", 
     "Kuka on luokkamme insinööri?": "Migara",
@@ -40,43 +39,21 @@ if 'sanat' not in st.session_state:
     st.session_state.show_correct_image = False
 
 st.set_page_config(page_title="Meidän ryhmä", page_icon="🇫🇮", layout="centered")
+
+
+# 🎵 3. 화면에서 완전히 숨겨진 유튜브 자동 재생 플레이어 (무한 반복)
+st.markdown("""
+    <iframe width="1" height="1" 
+        src="https://www.youtube.com/embed/5w3pMAsgR08?autoplay=1&loop=1&playlist=5w3pMAsgR08&mute=0" 
+        frameborder="0" 
+        allow="autoplay; encrypted-media" 
+        allowfullscreen
+        style="position:absolute; top:-100px; left:-100px;">
+    </iframe >
+""", unsafe_allow_html=True)
+
+
 st.title("🇫🇮 Meidän ryhmä")
-
-
-# 🎵 3. 자동 무한 반복 배경음악 플레이어 (중복 확장자 완벽 대응)
-def play_bgm():
-    # bgm.mp3.mp3 또는 bgm.mp3 둘 다 찾아내는 스마트 추적
-    file_name = None
-    if os.path.exists("bgm.mp3.mp3"):
-        file_name = "bgm.mp3.mp3"
-    elif os.path.exists("bgm.mp3"):
-        file_name = "bgm.mp3"
-
-    if file_name:
-        with open(file_name, "rb") as f:
-            data = f.read()
-            b64 = base64.b64encode(data).decode()
-            md = f"""
-                <audio id="bgm" autoplay loop>
-                    <source src="data:audio/mp3;base64,{b64}" type="audio/mp3">
-                </audio>
-                <script>
-                    var audio = document.getElementById("bgm");
-                    audio.volume = 0.3; // 소리 크기 (0.0 ~ 1.0)
-                    
-                    // 새로고침 해도 음악이 끊김 없이 흐르게 하는 마법
-                    if (localStorage.getItem("bgm_time")) {{
-                        audio.currentTime = parseFloat(localStorage.getItem("bgm_time"));
-                    }}
-                    setInterval(function() {{
-                        localStorage.setItem("bgm_time", audio.currentTime);
-                    }}, 300);
-                </script>
-                """
-            st.markdown(md, unsafe_allow_html=True)
-
-play_bgm()
-
 
 # 🏆 4. 게임 종료 및 B1 TODISTUS 출력 화면
 if st.session_state.game_over:
@@ -92,7 +69,7 @@ if st.session_state.game_over:
             <h1 style="color: #1A365D; font-family: 'Georgia', serif; font-size: 36px; margin-bottom: 5px;">VIRALLINEN TODISTUS</h1>
             <p style="color: #666; font-size: 14px; letter-spacing: 2px; margin-top: 0;">SUOMEN KIELEN OSAAMINEN</p>
             <hr style="border: 0; height: 1px; background-image: linear-gradient(to right, rgba(0,0,0,0), rgba(212,175,55,0.75), rgba(0,0,0,0)); margin: 20px 0;">
-            <p style="font-size: 18px; color: #333; font-style: italic;">Täten todistetaan, etta</p>
+            <p style="font-size: 18px; color: #333; font-style: italic;">Täten todistetaan, että</p>
             <h2 style="color: #D4AF37; font-family: 'Arial', sans-serif; font-size: 32px; margin: 15px 0;">Heidi Opettaja</h2>
             <p style="font-size: 18px; color: #333; line-height: 1.6;">
                 on läpäissyt "Meidän ryhmä" -tietokilpailun <br>
