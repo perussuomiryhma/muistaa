@@ -1,8 +1,46 @@
 import streamlit as st
+import streamlit.components.v1 as components
 from PIL import Image
 import random
 import os
 
+# =========================================================================
+# [REQUIRED] Replace this URL with your actual hosted image URL.
+# (Do not use local file paths like "image/main.png" here. It must be a public URL)
+# =========================================================================
+OG_IMAGE_URL = "https://your-domain.com/path-to-your-image.png" 
+PAGE_TITLE = "Meidän ryhmä"
+PAGE_DESC = "Heidi opettajan B1-tasoa testaava hauska luokkatesti!"
+
+# 1. Page Configuration (Must be at the very top)
+st.set_page_config(
+    page_title=PAGE_TITLE, 
+    layout="centered",
+    page_icon="👥"
+)
+
+# 2. Inject Open Graph Meta Tags for Link Preview
+components.html(
+    f"""
+    <head>
+        <!-- Open Graph / Facebook -->
+        <meta property="og:type" content="website">
+        <meta property="og:title" content="{PAGE_TITLE}">
+        <meta property="og:description" content="{PAGE_DESC}">
+        <meta property="og:image" content="{OG_IMAGE_URL}">
+
+        <!-- Twitter -->
+        <meta property="twitter:card" content="summary_large_image">
+        <meta property="twitter:title" content="{PAGE_TITLE}">
+        <meta property="twitter:description" content="{PAGE_DESC}">
+        <meta property="twitter:image" content="{OG_IMAGE_URL}">
+    </head>
+    """,
+    height=0,
+)
+# =========================================================================
+
+# Quiz Data
 Meidän_ryhmä = {
     "Kuka on luokkamme opettaja?": "Heidi", 
     "Kuka on luokkamme insinööri?": "Migara",
@@ -24,6 +62,7 @@ Meidän_ryhmä = {
     "Hänellä on aina paras ystävä vierellään. Molemmat heistä puhuvat erittäin hyvää suomea.": "Soosan"
 }
 
+# Session State Initialization
 if 'sanat' not in st.session_state:
     kaikki_sanat = list(Meidän_ryhmä.keys())
     eka_kysymys = kaikki_sanat[0]
@@ -35,8 +74,6 @@ if 'sanat' not in st.session_state:
     st.session_state.pisteet = 0
     st.session_state.game_over = False
     st.session_state.show_correct_image = False
-
-st.set_page_config(page_title="Meidän ryhmä", layout="centered")
 
 classic_bgm = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"
 
@@ -124,9 +161,9 @@ else:
             image = Image.open(img_path)
             st.image(image, width=300)
         except Exception:
-            st.warning("⚠️ Kuvan avaamisessa on ongelma.")
+            st.warning("⚠️ Error opening image.")
     else:
-        st.error(f"❌ Kuvaa ei löytynyt: image/{oikea_vastaus.lower()}")
+        st.error(f"❌ Image not found: image/{oikea_vastaus.lower()}")
 
     st.write(f"**Kysymys {st.session_state.idx + 1} / {len(Meidän_ryhmä)}**")
     st.info(current_q)
