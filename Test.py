@@ -17,7 +17,7 @@ Meidän_ryhmä = {
     "Hän tuli luokallemme noin elokuussa. Puhuu hyvää suomea ja haaveilee vaatesuunnittelijan urasta.": "Khali",
     "Hän on pieni mutta vahva. Hän on aina erittäin ystävällinen.": "Sakineh",
     "Hänestä oli heti alusta asti paljon huhuja, että hän puhuu erittäin hyvää suomea.": "Oksana",
-    "Hän oli erittäin aktiivinen ensiapuohjelmassa.": "Andri",
+    "Hän oli erittäin aktiivinen ensiapuohjelmassa.": "Andrii",
     "Hän istuu aina takarivissä, mutta suhtautuu suomen kielen opiskeluun suurella sydämellä.": "Serhii",
     "Hän on aina Oksanan parina luokassa.": "Elena",
     "Kuka istuu Tanjan lähellä?": "Anna",
