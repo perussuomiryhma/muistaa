@@ -5,42 +5,19 @@ import random
 import os
 
 # =========================================================================
-# [필수 수정] 카카오톡/슬랙 등에 링크를 보냈을 때 뜨게 할 사진 주소를 넣어주세요.
-# 내부 경로(예: "image/main.png")는 안 되며, 인터넷 주소(http...)여야 합니다.
+# CONFIGURATION
 # =========================================================================
-OG_IMAGE_URL = "YOUR_IMAGE_URL_HERE" 
 PAGE_TITLE = "Meidän ryhmä"
 PAGE_DESC = "Heidi opettajan B1-tasoa testaava hauska luokkatesti!"
 
-# 1. 페이지 기본 설정 (무조건 코드의 최상단에 위치해야 에러가 나지 않습니다)
 st.set_page_config(
     page_title=PAGE_TITLE, 
     layout="centered",
     page_icon="👥"
 )
-
-# 2. 링크 미리보기용 Open Graph 메타태그 강제 주입
-components.html(
-    f"""
-    <head>
-        <!-- Open Graph / Facebook / Kakao -->
-        <meta property="og:type" content="website">
-        <meta property="og:title" content="{PAGE_TITLE}">
-        <meta property="og:description" content="{PAGE_DESC}">
-        <meta property="og:image" content="{OG_IMAGE_URL}">
-
-        <!-- Twitter -->
-        <meta property="twitter:card" content="summary_large_image">
-        <meta property="twitter:title" content="{PAGE_TITLE}">
-        <meta property="twitter:description" content="{PAGE_DESC}">
-        <meta property="twitter:image" content="{OG_IMAGE_URL}">
-    </head>
-    """,
-    height=0, # 화면 레이아웃을 해치지 않도록 높이를 0으로 설정
-)
 # =========================================================================
 
-# 퀴즈 데이터 정의
+# Quiz Data Definition
 Meidän_ryhmä = {
     "Kuka on luokkamme opettaja?": "Heidi", 
     "Kuka on luokkamme insinööri?": "Migara",
@@ -62,16 +39,16 @@ Meidän_ryhmä = {
     "Hänellä on aina paras ystävä vierellään. Molemmat heistä puhuvat erittäin hyvää suomea.": "Soosan"
 }
 
-# 세션 상태(Session State) 초기화
-if 'sanat' not in st.session_state:
-    kaikki_sanat = list(Meidän_ryhmä.keys())
-    eka_kysymys = kaikki_sanat[0]
-    muut_kysymykset = kaikki_sanat[1:]    
-    random.shuffle(muut_kysymykset)        
-    st.session_state.sanat = [eka_kysymys] + muut_kysymykset 
+# Initialize Session State
+if 'questions' not in st.session_state:
+    all_questions = list(Meidän_ryhmä.keys())
+    first_q = all_questions[0]
+    other_questions = all_questions[1:]    
+    random.shuffle(other_questions)        
+    st.session_state.questions = [first_q] + other_questions 
     
-    st.session_state.idx = 0
-    st.session_state.pisteet = 0
+    st.session_state.current_idx = 0
+    st.session_state.score = 0
     st.session_state.game_over = False
     st.session_state.show_correct_image = False
 
@@ -79,12 +56,12 @@ st.title("Meidän ryhmä")
 
 if st.session_state.game_over:
     st.balloons()
-    max_pisteet = len(Meidän_ryhmä)
-    saadut_pisteet = st.session_state.pisteet
+    max_score = len(Meidän_ryhmä)
+    final_score = st.session_state.score
     
-    st.success(f"🎉 Lopputesti on päättynyt! Tuloksesi: {saadut_pisteet}/{max_pisteet}")
+    st.success(f"🎉 Lopputesti on päättynyt! Tuloksesi: {final_score}/{max_score}")
     
-    if saadut_pisteet == max_pisteet:
+    if final_score == max_score:
         st.markdown(f"""
         <div style="border: 8px double #D4AF37; padding: 30px; text-align: center; background-color: #FDFBF7; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-top: 20px;">
             <span style="font-size: 50px;">🏅</span>
@@ -95,7 +72,7 @@ if st.session_state.game_over:
             <h2 style="color: #D4AF37; font-family: 'Arial', sans-serif; font-size: 32px; margin: 15px 0;">Heidi Opettaja</h2>
             <p style="font-size: 18px; color: #333; line-height: 1.6;">
                 on läpäissyt "Meidän ryhmä" -tietokilpailun <br>
-                <b>täydellisillä pisteillä ({saadut_pisteet}/{max_pisteet})</b> <br>
+                <b>täydellisillä pisteillä ({final_score}/{max_score})</b> <br>
                 ja saavuttanut virallisesti tason:
             </p>
             <div style="background-color: #1A365D; color: white; display: inline-block; padding: 10px 40px; font-size: 30px; font-weight: bold; border-radius: 8px; margin: 20px 0; letter-spacing: 3px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
@@ -117,8 +94,8 @@ if st.session_state.game_over:
         st.rerun()
 
 else:
-    current_q = st.session_state.sanat[st.session_state.idx]
-    oikea_vastaus = Meidän_ryhmä[current_q]
+    current_q = st.session_state.questions[st.session_state.current_idx]
+    correct_answer = Meidän_ryhmä[current_q]
     
     img_path = None
     target_folder = "image"
@@ -128,7 +105,7 @@ else:
         if st.session_state.show_correct_image:
             for f in files:
                 name_part, _ = os.path.splitext(f)
-                if name_part.lower() == oikea_vastaus.lower():
+                if name_part.lower() == correct_answer.lower():
                     img_path = os.path.join(target_folder, f)
                     break
         else:
@@ -142,11 +119,11 @@ else:
             image = Image.open(img_path)
             st.image(image, width=300)
         except Exception:
-            st.warning("⚠️ Kuvan avaamisessa on ongelma.")
+            st.warning("⚠️ Problem opening the image.")
     else:
-        st.error(f"❌ Kuvaa ei löytynyt: image/{oikea_vastaus.lower()}")
+        st.error(f"❌ Image not found: image/{correct_answer.lower()}")
 
-    st.write(f"**Kysymys {st.session_state.idx + 1} / {len(Meidän_ryhmä)}**")
+    st.write(f"**Kysymys {st.session_state.current_idx + 1} / {len(Meidän_ryhmä)}**")
     st.info(current_q)
 
     if 'feedback' in st.session_state:
@@ -158,26 +135,26 @@ else:
     if st.session_state.show_correct_image:
         if st.button("Seuraava kysymys ➡️"):
             st.session_state.show_correct_image = False
-            st.session_state.idx += 1
+            st.session_state.current_idx += 1
             if 'feedback' in st.session_state:
                 del st.session_state.feedback
             
-            if st.session_state.idx >= len(st.session_state.sanat):
+            if st.session_state.current_idx >= len(st.session_state.questions):
                 st.session_state.game_over = True
             st.rerun()
     else:
-        with st.form(key=f"quiz_form_{st.session_state.idx}", clear_on_submit=True):
+        with st.form(key=f"quiz_form_{st.session_state.current_idx}", clear_on_submit=True):
             user_input = st.text_input("Kirjoita nimi tähän:").strip()
             submit_button = st.form_submit_button(label="Tarkista")
             
             if submit_button and user_input:
-                if user_input.title() == oikea_vastaus:
+                if user_input.title() == correct_answer:
                     st.session_state.feedback = "Heidi opettaja! Sinä olet B1 🎉"
                     st.session_state.feedback_type = "success"
-                    st.session_state.pisteet += 1
+                    st.session_state.score += 1
                     st.session_state.show_correct_image = True
                     st.rerun()
                 else:
-                    st.session_state.feedback = f"Heidi opettaja! Sinä olet A2.2\nVinkki: {oikea_vastaus[0]}"
+                    st.session_state.feedback = f"Heidi opettaja! Sinä olet A2.2\nVinkki: {correct_answer[0]}"
                     st.session_state.feedback_type = "error"
                     st.rerun()
