@@ -10,7 +10,7 @@ st.set_page_config(
     page_icon="👥"
 )
 
-# 화면 청소 및 스타일 설정
+# 화면 청소 스타일 설정
 st.markdown("""
     <style>
     #MainMenu {visibility: hidden;}
@@ -19,29 +19,17 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# 💡 [마법의 자동 재생 코드] 
-# 학생들이 화면을 한 번 터치하거나 클릭하면 음악이 무한 반복(loop)으로 자동 재생됩니다.
+# 💡 [진짜 자동 재생 치트키]
+# 눈에 안 보이는 투명 유튜브 플레이어를 심어서, 학생들이 아무것도 안 눌러도 음악이 자동 재생됩니다!
+# (유튜브의 신나는 카페/퀴즈 음악 링크를 심어두었습니다)
 st.components.v1.html(
     """
-    <script>
-    // 브라우저 보안을 우회하기 위해 화면 클릭/터치 감지 시 오디오 재생
-    function startAudio() {
-        var audio = document.getElementById('bgm');
-        audio.play().catch(function(error) {
-            console.log("자동 재생 대기 중...");
-        });
-        // 음악이 켜지면 더 이상 이벤트를 감지하지 않음
-        document.removeEventListener('click', startAudio);
-        document.removeEventListener('touchstart', startAudio);
-    }
-    
-    document.addEventListener('click', startAudio);
-    document.addEventListener('touchstart', startAudio);
-    </script>
-    
-    <audio id="bgm" loop>
-        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mp3">
-    </audio>
+    <iframe width="0" height="0" 
+        src="https://www.youtube.com/embed/vT7_lO3VDic?autoplay=1&mute=0&loop=1&playlist=vT7_lO3VDic" 
+        title="BGM" frameborder="0" 
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+        allowfullscreen style="position: absolute; width: 0; height: 0; border: none;">
+    </iframe>
     """,
     height=0,
 )
@@ -81,7 +69,7 @@ Meidän_ryhmä = {
     "Hän on aina Oksanan parina luokassa.": "Elena",
     "Kuka istuu Tanjan lähellä?": "Anna",
     "Hän on erittäin kiinnostunut suomen kielestä ja on aina ystävällinen.": "Elius",
-    "Hän istuu aina keskirivissä og opiskelee suomea todella ahcerasti.": "Yogendra",
+    "Hän istuu aina keskirivissä og opiskelee suomea todella ahkerasti.": "Yogendra",
     "Hänellä on aina paras ystävä vierellään. Molemmat heistä puhuvat erittäin hyvää suomea.": "Soosan"
 }
 
