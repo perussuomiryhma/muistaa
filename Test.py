@@ -10,7 +10,7 @@ st.set_page_config(
     page_icon="👥"
 )
 
-# 2. 왓츠앱/팀즈 메신저용 절대 깨지지 않는 1번 퀴즈 일러스트 사진 등록 완료!
+# 2. 왓츠앱/팀즈 메신저용 절대 깨지지 않는 1번 퀴즈 일러스트 사진 등록
 st.components.v1.html(
     """
     <head>
@@ -86,11 +86,21 @@ else:
     st.write(f"**Kysymys {st.session_state.current_idx + 1} / {len(Meidän_ryhmä)}**")
     st.info(current_q)
 
+    # 💡 틀렸을 때 선생님이 주신 명단을 예쁘게 정렬해서 힌트창에 띄워줍니다.
     if 'feedback' in st.session_state:
-        if st.session_state.feedback_type == "success": st.success(st.session_state.feedback)
+        if st.session_state.feedback_type == "success": 
+            st.success(st.session_state.feedback)
         else:
             st.error(st.session_state.feedback)
-            st.warning(f"💡 Vinkki (Hint): Nimi alkaa kirjaimella **'{correct_answer[0]}'**")
+            st.markdown("""
+            <div style="background-color: #FFF9E6; padding: 15px; border-left: 5px solid #FFCC00; border-radius: 5px;">
+                <p style="margin: 0 0 8px 0; font-weight: bold; color: #7A5C00;">💡 Vinkki (Nimivaihtoehdot):</p>
+                <p style="margin: 0; color: #555; font-size: 14px; line-height: 1.6;">
+                    Heidi, Anna, Mbuyi, Migara, Sana, Tanja, Hamza, Sunita, Antony, <br>
+                    Khali, Sakineh, Oksana, Andrii, Serhii, Elena, Elius, Yogendra, Soosan
+                </p>
+            </div>
+            """, unsafe_allow_html=True)
 
     if st.session_state.show_correct_image:
         if st.button("Seuraava kysymys ➡️"):
@@ -109,6 +119,6 @@ else:
                     st.session_state.score += 1
                     st.session_state.show_correct_image = True
                 else:
-                    st.session_state.feedback = "Heidi opettajan A2.2 ❌"
+                    st.session_state.feedback = "Heidi opettaja! Sinä olet A2.2 ❌"
                     st.session_state.feedback_type = "error"
                 st.rerun()
