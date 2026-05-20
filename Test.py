@@ -10,18 +10,54 @@ st.set_page_config(
     page_icon="👥"
 )
 
-# 2. 왓츠앱/팀즈 메신저용 절대 깨지지 않는 1번 퀴즈 일러스트 사진 등록
+# 화면 청소 및 스타일 설정
+st.markdown("""
+    <style>
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
+    </style>
+    """, unsafe_allow_html=True)
+
+# 💡 [마법의 자동 재생 코드] 
+# 학생들이 화면을 한 번 터치하거나 클릭하면 음악이 무한 반복(loop)으로 자동 재생됩니다.
+st.components.v1.html(
+    """
+    <script>
+    // 브라우저 보안을 우회하기 위해 화면 클릭/터치 감지 시 오디오 재생
+    function startAudio() {
+        var audio = document.getElementById('bgm');
+        audio.play().catch(function(error) {
+            console.log("자동 재생 대기 중...");
+        });
+        // 음악이 켜지면 더 이상 이벤트를 감지하지 않음
+        document.removeEventListener('click', startAudio);
+        document.removeEventListener('touchstart', startAudio);
+    }
+    
+    document.addEventListener('click', startAudio);
+    document.addEventListener('touchstart', startAudio);
+    </script>
+    
+    <audio id="bgm" loop>
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mp3">
+    </audio>
+    """,
+    height=0,
+)
+
+# 2. 왓츠앱/팀즈 메신저용 미리보기 태그
 st.components.v1.html(
     """
     <head>
         <meta property="og:type" content="website">
         <meta property="og:title" content="Meidän ryhmä">
         <meta property="og:description" content="Heidi opettajan B1-tasoa testaava hauska luokkatesti!">
-        <meta property="og:image" content="https://pub-static.fotor.com/assets/projects/pages/d9f78310-8bde-11ed-bd68-d326f63459c7_55eef501-f2f2-4467-8d89-9dbb3b4bf2da_w.jpg">
+        <meta property="og:image" content="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=800">
         <meta property="twitter:card" content="summary_large_image">
         <meta property="twitter:title" content="Meidän ryhmä">
         <meta property="twitter:description" content="Heidi opettajan B1-tasoa testaava hauska luokkatesti!">
-        <meta property="twitter:image" content="https://pub-static.fotor.com/assets/projects/pages/d9f78310-8bde-11ed-bd68-d326f63459c7_55eef501-f2f2-4467-8d89-9dbb3b4bf2da_w.jpg">
+        <meta property="twitter:image" content="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=800">
     </head>
     """,
     height=0,
@@ -45,7 +81,7 @@ Meidän_ryhmä = {
     "Hän on aina Oksanan parina luokassa.": "Elena",
     "Kuka istuu Tanjan lähellä?": "Anna",
     "Hän on erittäin kiinnostunut suomen kielestä ja on aina ystävällinen.": "Elius",
-    "Hän istuu aina keskirivissä og opiskelee suomea todella ahkerasti.": "Yogendra",
+    "Hän istuu aina keskirivissä og opiskelee suomea todella ahcerasti.": "Yogendra",
     "Hänellä on aina paras ystävä vierellään. Molemmat heistä puhuvat erittäin hyvää suomea.": "Soosan"
 }
 
@@ -86,7 +122,6 @@ else:
     st.write(f"**Kysymys {st.session_state.current_idx + 1} / {len(Meidän_ryhmä)}**")
     st.info(current_q)
 
-    # 💡 틀렸을 때 선생님이 주신 명단을 예쁘게 정렬해서 힌트창에 띄워줍니다.
     if 'feedback' in st.session_state:
         if st.session_state.feedback_type == "success": 
             st.success(st.session_state.feedback)
