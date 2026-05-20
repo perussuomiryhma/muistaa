@@ -3,14 +3,12 @@ from PIL import Image
 import random
 import os
 
-# 1. 페이지 설정
 st.set_page_config(
     page_title="Meidän ryhmä", 
     layout="centered",
     page_icon="👥"
 )
 
-# 화면 청소 스타일 설정
 st.markdown("""
     <style>
     #MainMenu {visibility: hidden;}
@@ -19,9 +17,6 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# 💡 [진짜 자동 재생 치트키]
-# 눈에 안 보이는 투명 유튜브 플레이어를 심어서, 학생들이 아무것도 안 눌러도 음악이 자동 재생됩니다!
-# (유튜브의 신나는 카페/퀴즈 음악 링크를 심어두었습니다)
 st.components.v1.html(
     """
     <iframe width="0" height="0" 
@@ -34,7 +29,6 @@ st.components.v1.html(
     height=0,
 )
 
-# 2. 왓츠앱/팀즈 메신저용 미리보기 태그
 st.components.v1.html(
     """
     <head>
@@ -51,7 +45,6 @@ st.components.v1.html(
     height=0,
 )
 
-# 퀴즈 데이터
 Meidän_ryhmä = {
     "Kuka on luokkamme opettaja?": "Heidi", 
     "Kuka on luokkamme insinööri?": "Migara",
@@ -117,7 +110,7 @@ else:
             st.error(st.session_state.feedback)
             st.markdown("""
             <div style="background-color: #FFF9E6; padding: 15px; border-left: 5px solid #FFCC00; border-radius: 5px;">
-                <p style="margin: 0 0 8px 0; font-weight: bold; color: #7A5C00;">💡 Vinkki (Nimivaihtoehdot):</p>
+                <p style="margin: 0 0 8px 0; font-weight: bold; color: #7A5C00;">💡 Hint (Name Options):</p>
                 <p style="margin: 0; color: #555; font-size: 14px; line-height: 1.6;">
                     Heidi, Anna, Mbuyi, Migara, Sana, Tanja, Hamza, Sunita, Antony, <br>
                     Khali, Sakineh, Oksana, Andrii, Serhii, Elena, Elius, Yogendra, Soosan
