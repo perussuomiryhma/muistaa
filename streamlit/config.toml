@@ -1,2 +1,18 @@
 https://muistaa-cbz8p2bip9hejqcaezq9ue.streamlit.app/
-https://github.com/perussuomiryhma/muistaa/blob/main/image/quiz_main.jpg?raw=true
+[browser]
+gatherUsageStats = false
+
+[server]
+headHTML = """
+<!-- Open Graph / Facebook / Kakao -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Meidän ryhmä">
+<meta property="og:description" content="Heidi opettajan B1-tasoa testaava hauska luokkatesti!">
+<meta property="og:image" content="https://github.com/perussuomiryhma/muistaa/blob/main/image/quiz_main.jpg?raw=true">
+
+<!-- Twitter -->
+<meta property="twitter:card" content="summary_large_image">
+<meta property="twitter:title" content="Meidän ryhmä">
+<meta property="twitter:description" content="Heidi opettajan B1-tasoa testaava hauska luokkatesti!">
+<meta property="twitter:image" content="https://images.unsplash.com/photo-1516321318423-f06f85e504b3">
+"""
